@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <title>Вход в систему</title>
+    <title>Вход в систему - COVID-19 Detector</title>
     <%@include file="../include/links.html" %>
 </head>
 <body>
