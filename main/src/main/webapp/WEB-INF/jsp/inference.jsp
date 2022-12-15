@@ -19,7 +19,7 @@
         <div class="row>">
             <form action="${pageContext.request.contextPath}/" method="post" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label for="image-loader">Прикрепите изображение с КТ-снимком легких</label>
+                    <label for="image-loader">Прикрепите изображение с КТ-снимком легких</label><br>
                     <input type="file" id="image-loader" name="image" required accept=".jpg, .jpeg, .png">
                 </div>
                 <div class="form-group">
