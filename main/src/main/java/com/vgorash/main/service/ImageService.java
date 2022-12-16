@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -47,9 +48,14 @@ public class ImageService {
     }
 
     private HttpEntity<MultiValueMap<String, Object>> prepareRequest(MultipartFile image) throws IOException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image.getBytes()));
-        ImageIO.write(bufferedImage, "png", output);
+        BufferedImage resizedImage = new BufferedImage(500, 500, BufferedImage.TYPE_USHORT_GRAY);
+        Graphics2D graphics2D = resizedImage.createGraphics();
+        graphics2D.drawImage(bufferedImage, 0, 0, 500, 500, null);
+        graphics2D.dispose();
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ImageIO.write(resizedImage, "png", output);
         String base64 = Base64.getEncoder().encodeToString(output.toByteArray());
 
         HttpHeaders headers = new HttpHeaders();
