@@ -23,4 +23,9 @@ public class MainController {
         return inferenceService.doInference(imageBase64);
     }
 
+    @PostMapping ("/test")
+    public boolean test(){
+        return true;
+    }
+
 }

@@ -49,9 +49,9 @@ public class ImageService {
 
     private HttpEntity<MultiValueMap<String, Object>> prepareRequest(MultipartFile image) throws IOException {
         BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image.getBytes()));
-        BufferedImage resizedImage = new BufferedImage(500, 500, BufferedImage.TYPE_USHORT_GRAY);
+        BufferedImage resizedImage = new BufferedImage(512, 512, BufferedImage.TYPE_USHORT_GRAY);
         Graphics2D graphics2D = resizedImage.createGraphics();
-        graphics2D.drawImage(bufferedImage, 0, 0, 500, 500, null);
+        graphics2D.drawImage(bufferedImage, 0, 0, 512, 512, null);
         graphics2D.dispose();
 
         ByteArrayOutputStream output = new ByteArrayOutputStream();
