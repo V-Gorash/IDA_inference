@@ -48,24 +48,27 @@ public class ImageService {
         }
     }
 
-    public Boolean checkImage(MultipartFile image){
+    public Integer checkImage(MultipartFile image){
         try {
-            return restTemplate.postForObject("http://IDA-Check/check", prepareRequest(image), Boolean.class);
+            return restTemplate.postForObject("http://IDA-Check/check", prepareRequest(image), Integer.class);
         }
         catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
     }
 
-    private HttpEntity<MultiValueMap<String, Object>> prepareRequest(MultipartFile image) throws IOException {
+    private BufferedImage prepareImage(MultipartFile image) throws IOException {
         BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image.getBytes()));
         BufferedImage resizedImage = new BufferedImage(512, 512, BufferedImage.TYPE_BYTE_GRAY);
         Graphics2D graphics2D = resizedImage.createGraphics();
         graphics2D.drawImage(bufferedImage, 0, 0, 512, 512, null);
         graphics2D.dispose();
+        return resizedImage;
+    }
 
+    private HttpEntity<MultiValueMap<String, Object>> prepareRequest(BufferedImage image) throws IOException{
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        ImageIO.write(resizedImage, "png", output);
+        ImageIO.write(image, "png", output);
         String base64 = Base64.getEncoder().encodeToString(output.toByteArray());
 
         HttpHeaders headers = new HttpHeaders();
@@ -74,5 +77,9 @@ public class ImageService {
                 = new LinkedMultiValueMap<>();
         body.add("image", base64);
         return new HttpEntity<>(body, headers);
+    }
+
+    private HttpEntity<MultiValueMap<String, Object>> prepareRequest(MultipartFile image) throws IOException {
+        return prepareRequest(prepareImage(image));
     }
 }

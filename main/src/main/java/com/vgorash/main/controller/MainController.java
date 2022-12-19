@@ -25,7 +25,7 @@ public class MainController {
     @RequestMapping( value = "/", method = RequestMethod.POST)
     public String inference(Map<String, Object> model, @RequestParam("image") MultipartFile image){
         model.put("base64Image", imageService.processImage(image));
-        model.put("isValid", imageService.checkImage(image));
+        model.put("validType", imageService.checkImage(image));
         return "inference_result";
     }
 

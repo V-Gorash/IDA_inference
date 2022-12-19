@@ -16,9 +16,14 @@
                 <h1>Результат обработки</h1>
             </div>
         </div>
-        <c:if test="${!isValid}">
+        <c:if test="${validType == 0}">
             <div class="alert alert-danger" role="alert">
                 Система считает, что это изображение не является КТ-снимком легких
+            </div>
+        </c:if>
+        <c:if test="${validType == 2}">
+            <div class="alert alert-warning" role="alert">
+                Результат может быть некорректен из-за посторонних объектов на снимке. Пожалуйста обрежьте изображение
             </div>
         </c:if>
         <div class="row>">

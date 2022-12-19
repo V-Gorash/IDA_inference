@@ -20,8 +20,8 @@ def check():
     image = Image.open(io.BytesIO(base64.b64decode(image_base64)))
     input_arr = tf.keras.utils.img_to_array(image)
     input_arr = np.array([input_arr])
-    result = model.predict(input_arr)
-    return Response("true" if result[0][0] < result[0][1] else "false", mimetype='application/json')
+    result = model.predict(input_arr).argmax(axis=-1)[0]
+    return Response(str(result), mimetype='application/json')
 
 
 @app.route("/healthcheck")
