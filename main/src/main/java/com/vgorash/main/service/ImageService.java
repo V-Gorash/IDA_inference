@@ -31,7 +31,17 @@ public class ImageService {
 
     public String processImage(MultipartFile image){
         try {
-            return restTemplate.postForObject("http://IDA-Segmentation/segmentation", prepareRequest(image), String.class);
+            String processedBase64 = restTemplate.postForObject("http://IDA-Segmentation/segmentation", prepareRequest(image), String.class);
+            BufferedImage processedImage = ImageIO.read(new ByteArrayInputStream(Base64.getDecoder().decode(processedBase64)));
+
+            BufferedImage resultImage = new BufferedImage(512, 512, BufferedImage.TYPE_BYTE_GRAY);
+            Graphics2D graphics2D = resultImage.createGraphics();
+            graphics2D.drawImage(processedImage, 0, 0, 512, 512, null);
+
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            ImageIO.write(resultImage, "png", output);
+
+            return Base64.getEncoder().encodeToString(output.toByteArray());
         }
         catch (Exception e){
             throw new RuntimeException(e.getMessage());
@@ -49,7 +59,7 @@ public class ImageService {
 
     private HttpEntity<MultiValueMap<String, Object>> prepareRequest(MultipartFile image) throws IOException {
         BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image.getBytes()));
-        BufferedImage resizedImage = new BufferedImage(512, 512, BufferedImage.TYPE_USHORT_GRAY);
+        BufferedImage resizedImage = new BufferedImage(512, 512, BufferedImage.TYPE_BYTE_GRAY);
         Graphics2D graphics2D = resizedImage.createGraphics();
         graphics2D.drawImage(bufferedImage, 0, 0, 512, 512, null);
         graphics2D.dispose();

@@ -14,14 +14,14 @@ app = Flask(__name__)
 
 
 @app.route("/check", methods=["POST"])
-def check():  # put application's code here
+def check():
     global model
     image_base64 = request.form.get("image")
     image = Image.open(io.BytesIO(base64.b64decode(image_base64)))
     input_arr = tf.keras.utils.img_to_array(image)
     input_arr = np.array([input_arr])
-    result = model.predict([input_arr])
-    return Response("true" if result[0][0] > result[0][1] else "false", mimetype='application/json')
+    result = model.predict(input_arr)
+    return Response("true" if result[0][0] < result[0][1] else "false", mimetype='application/json')
 
 
 @app.route("/healthcheck")
@@ -57,7 +57,6 @@ if __name__ == '__main__':
         host = "localhost"
 
     assert config["model"] is not None, "Error: empty model path"
-    model = tf.keras.models.load_model(config["model"])
 
     consul.register_service(
         name='IDA-Check',
@@ -67,4 +66,5 @@ if __name__ == '__main__':
         httpcheck='http://' + host + ':' + str(port) + '/healthcheck'
     )
     atexit.register(lambda: on_exit(port))
+    model = tf.keras.models.load_model(config["model"])
     app.run(port=port, host=host)
