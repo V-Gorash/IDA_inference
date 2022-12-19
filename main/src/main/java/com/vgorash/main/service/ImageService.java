@@ -31,12 +31,24 @@ public class ImageService {
 
     public String processImage(MultipartFile image){
         try {
-            String processedBase64 = restTemplate.postForObject("http://IDA-Segmentation/segmentation", prepareRequest(image), String.class);
+            BufferedImage originalImage = prepareImage(image);
+            String processedBase64 = restTemplate.postForObject("http://IDA-Segmentation/segmentation", prepareRequest(originalImage), String.class);
             BufferedImage processedImage = ImageIO.read(new ByteArrayInputStream(Base64.getDecoder().decode(processedBase64)));
 
-            BufferedImage resultImage = new BufferedImage(512, 512, BufferedImage.TYPE_BYTE_GRAY);
+            BufferedImage maskImage = new BufferedImage(processedImage.getWidth(), processedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            for(int h = 0; h < processedImage.getHeight(); h++){
+                for (int w = 0; w < processedImage.getWidth(); w++){
+                    int value = processedImage.getRGB(h, w);
+                    int alpha = value > 0 ? 10 : 0;
+                    int pixel = (alpha << 24) | (value << 16);
+                    maskImage.setRGB(h, w, pixel);
+                }
+            }
+
+            BufferedImage resultImage = new BufferedImage(processedImage.getWidth(), processedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
             Graphics2D graphics2D = resultImage.createGraphics();
-            graphics2D.drawImage(processedImage, 0, 0, 512, 512, null);
+            graphics2D.drawImage(originalImage, 0, 0, originalImage.getWidth(), originalImage.getHeight(), null);
+            graphics2D.drawImage(maskImage, 0, 0, maskImage.getWidth(), maskImage.getHeight(), null);
 
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             ImageIO.write(resultImage, "png", output);
