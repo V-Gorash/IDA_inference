@@ -61,7 +61,7 @@ if __name__ == '__main__':
     consul.register_service(
         name='IDA-Check',
         service_id=str(port),
-        interval='1s',
+        interval='30s',
         port=port,
         httpcheck='http://' + host + ':' + str(port) + '/healthcheck'
     )
